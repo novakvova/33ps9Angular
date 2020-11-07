@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using WebApi.Server.Data;
 using WebApi.Server.Data.Entities;
 using WebApi.Server.Models;
 using WebApi.Server.Services;
@@ -56,7 +57,35 @@ namespace WebApi.Server.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] UserRegisterViewModel model)
         {
-            return Ok();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Bad model");
+            }
+            var user = new DbUser
+            {
+                Email = model.Email,
+                UserName = model.Email,
+                Image = model.ImageBase64,
+                Age = 0,
+                Phone = model.Phone,
+                Description = "PHP programmer"
+            };
+            var result = await _userManager.CreateAsync(user, model.Password);
+            if (!result.Succeeded)
+            {
+                return BadRequest(new { invalid = "Помилка створення користувача" });
+            }
+            result = await _userManager.AddToRoleAsync(user, Roles.User);
+            if (!result.Succeeded)
+            {
+                return BadRequest(new { invalid = "Не вдалося надати роль" });
+            }
+            await _signInManager.SignInAsync(user, isPersistent: false);
+            return Ok(
+                new
+                {
+                    token = _jwtTokenService.CreateToken(user)
+                });
         }
     }
 }
