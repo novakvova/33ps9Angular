@@ -7,12 +7,16 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using WebApi.Server.Data;
+using WebApi.Server.Data.Entities;
 
 namespace WebApi.Server
 {
@@ -29,6 +33,18 @@ namespace WebApi.Server
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCors();
+
+            // Add framework services.
+            services.AddDbContext<EFContext>(options =>
+                options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
+
+            //services.AddDbContext<EfContext>(opt =>
+            //    opt.UseSqlServer(Configuration
+            //        .GetConnectionString("DefaultConnection")));
+
+            services.AddIdentity<DbUser, DbRole>(options => options.Stores.MaxLengthForKeys = 128)
+                .AddEntityFrameworkStores<EFContext>()
+                .AddDefaultTokenProviders();
 
             services.AddSwaggerGen(c =>
             {
@@ -72,8 +88,6 @@ namespace WebApi.Server
 
             });
 
-
-
             services.AddControllers();
         }
 
@@ -99,6 +113,7 @@ namespace WebApi.Server
 
             app.UseAuthorization();
 
+            SeederDB.SeedDataByAS(app.ApplicationServices);
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>
