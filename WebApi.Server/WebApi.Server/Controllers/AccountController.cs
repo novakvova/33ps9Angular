@@ -3,8 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using WebApi.Server.Data.Entities;
 using WebApi.Server.Models;
+using WebApi.Server.Services;
 
 namespace WebApi.Server.Controllers
 {
@@ -12,10 +16,41 @@ namespace WebApi.Server.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
+        private readonly UserManager<DbUser> _userManager;
+        private readonly SignInManager<DbUser> _signInManager;
+        private readonly IJwtTokenService _jwtTokenService;
+
+        public AccountController(UserManager<DbUser> userManager,
+            SignInManager<DbUser> signInManager,
+            IJwtTokenService jwtTokenService)
+        {
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _jwtTokenService = jwtTokenService;
+        }
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] UserLoginViewModel model)
         {
-            return Ok();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { invalid = "Bad Model" });
+            }
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if(user==null)
+            {
+                return BadRequest(new { invalid = "Даний користувач не знайденний" });
+            }
+            var result = await _signInManager.PasswordSignInAsync(user, model.Password,false, false);
+            if(!result.Succeeded)
+            {
+                return BadRequest(new { invalid = "Невірно введений пароль" });
+            }
+            await _signInManager.SignInAsync(user, isPersistent: false);
+            return Ok(
+                new
+                {
+                    token = _jwtTokenService.CreateToken(user)
+                });
         }
 
         [HttpPost("register")]
