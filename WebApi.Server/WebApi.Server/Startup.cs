@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -37,6 +38,14 @@ namespace WebApi.Server
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCors();
+
+            services.Configure<FormOptions>(options =>
+            {
+                // Set the limit to 256 MB
+                options.ValueCountLimit = 1024;
+                options.KeyLengthLimit = 1024 * 2;
+                options.ValueLengthLimit = 1024 * 1024 * 100;
+            });
 
             // Add framework services.
             services.AddDbContext<EFContext>(options =>

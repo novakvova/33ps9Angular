@@ -1,13 +1,51 @@
-<div class="mt-4">
-  <h2 class="text-center">Реєстрація</h2>
-  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+<div class="mt-2 d-flex justify-content-center">
+  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="splash-container">
+    <div class="card">
+      <div class="card-header text-center">
+        <h2 class="mb-1 font-weight-bold text-primary">Registration Form</h2>
+        <p>Please enter your user information.</p>
+      </div>
 
-    <div class="form-group">
-      <label for="email">Електронна адресса:</label>
-      <input type="text" class="form-control" formControlName="email" id="email">
+      <div class="card-body">
+            <div class="mb-4 d-flex justify-content-center">
+              <img [src]="imageUrl"
+                class="z-depth-1-half avatar-pic" alt="avatar">
+            </div>
+            <div class="d-flex justify-content-center m-3">
+                <label class="btn btn-primary" for="image">Choose an avatar</label>
+                <input type="file" name="image"  accept=".jpg, .jpeg, .png" #fileInput (change)="onFileChanged(fileInput.files[0])" value="Choose an avatar">
+            </div>
+
+          <div class="form-group">
+              <input [class.is-invalid]="_email.invalid && _email.touched" class="form-control form-control-lg" type="email" id="email" formControlName="email" placeholder="E-mail"/>
+              <div *ngIf="(_email.invalid && _email.touched) || _email.dirty">
+                <small *ngIf="_email.errors?.required" class="text-danger">Email is required</small>
+                <small *ngIf="_email.errors?.pattern" class="text-danger">Please provide a valid email address</small>
+              </div>
+          </div>
+
+          <div class="form-group">
+            <input [class.is-invalid]="_phone.invalid && _phone.touched" class="form-control form-control-lg" id="phone" maxlength="10" formControlName="phone" type="phone" placeholder="Phone number"/>
+            <div *ngIf="(_phone.invalid && _phone.touched) || _phone.dirty">
+              <small *ngIf="_phone.errors?.required" class="text-danger">Email is required</small>
+              <small *ngIf="_phone.errors?.pattern" class="text-danger">Phone number is not valid (enter 10 digits)</small>
+            </div>
+        </div>
+
+          <div class="form-group">
+              <input [class.is-invalid]="_password.invalid && _password.touched" class="form-control form-control-lg" id="password" formControlName="password" autocomplete="off" type="password" placeholder="Password"/>
+              <div *ngIf="(_password.invalid && _password.touched) || _password.dirty">
+                <small *ngIf="_password.errors?.required" class="text-danger">Password is required</small>
+                <small *ngIf="_password.errors?.pattern" class="text-danger">Only lowercase letters and numbers (6 symbols)</small>
+              </div>
+            </div>
+
+          <div class="form-group pt-2">
+              <button class="btn btn-block btn-primary"  [disabled]="!registerForm.valid" type="submit">Register My Account</button>
+          </div>
+
+      </div>
     </div>
-
-    <input type="submit" pButton value="Реєструватися" />
   </form>
 </div>
 
