@@ -11,13 +11,16 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {ButtonModule} from 'primeng/button';
 import {InputTextModule} from 'primeng/inputtext';
 import { NavMenuComponent } from './components/nav-menu/nav-menu.component';
+import { ApiService } from './core/api.service';
+import { ListUserComponent } from './components/user/list-user/list-user.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
     RegisterComponent,
-    NavMenuComponent
+    NavMenuComponent,
+    ListUserComponent
   ],
   imports: [
     BrowserModule,
@@ -28,7 +31,9 @@ import { NavMenuComponent } from './components/nav-menu/nav-menu.component';
     InputTextModule,
     HttpClientModule
   ],
-  providers: [],
+  providers: [
+    ApiService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

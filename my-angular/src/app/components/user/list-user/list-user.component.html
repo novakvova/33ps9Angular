@@ -1,0 +1,29 @@
+<div class="col-md-12">
+  <h2>Список користувачів</h2>
+
+  <table class="table table-striped">
+    <thead>
+    <tr>
+      <th class="hidden">Id</th>
+      <th></th>
+      <th>Пошта</th>
+      <th>Підтверження</th>
+      <th>Вік</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let user of users">
+      <td class="hidden">{{user.id}}</td>
+      <td>
+        <img [src]="user.image" width=50 />
+      </td>
+      <td>{{user.email}}</td>
+      <td>{{user.emailConfirmed}}</td>
+      <td>{{user.age}}</td>
+
+    </tr>
+    </tbody>
+  </table>
+
+
+</div>
